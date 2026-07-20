@@ -26,11 +26,24 @@ router = Router()
 admin_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="➕ Добавить товар"),
-            KeyboardButton(text="📦 Товары")
+            KeyboardButton(
+                text="➕ Добавить товар"
+            )
         ],
         [
-            KeyboardButton(text="📦 Заказы")
+            KeyboardButton(
+                text="✏️ Изменить товар"
+            )
+        ],
+        [
+            KeyboardButton(
+                text="🗑 Удалить товар"
+            )
+        ],
+        [
+            KeyboardButton(
+                text="📦 Заказы"
+            )
         ]
     ],
     resize_keyboard=True
@@ -514,6 +527,7 @@ async def admin_orders(
         await message.answer(
             f"📦 Заказ #{order.id}\n\n"
             f"👤 {order.customer_name}\n"
+            f"💬 Telegram: {order.telegram_username or 'Нет username'}\n"
             f"📱 {order.phone}\n"
             f"🏠 {order.address}\n\n"
             f"🛒 Товары:\n"

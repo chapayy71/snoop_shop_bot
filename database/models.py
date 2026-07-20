@@ -89,6 +89,8 @@ class Order(Base):
 
     customer_name: Mapped[str]
 
+    telegram_username: Mapped[str | None]
+
     phone: Mapped[str]
 
     address: Mapped[str]

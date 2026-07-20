@@ -136,9 +136,16 @@ async def checkout_address(
             total += product.price * item.quantity
 
 
+        username = message.from_user.username
+
+        if username:
+            username = f"@{username}"
+
+
         order = Order(
             user_id=user.id,
             customer_name=data["name"],
+            telegram_username=username,
             phone=data["phone"],
             address=message.text,
             total_price=total
@@ -147,7 +154,6 @@ async def checkout_address(
         session.add(order)
 
         await session.flush()
-
 
         for item, product in cart_items:
 
