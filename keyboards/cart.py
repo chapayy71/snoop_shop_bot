@@ -5,16 +5,36 @@ def cart_keyboard(items):
 
     buttons = []
 
+
     for item, product in items:
 
         buttons.append(
             [
                 InlineKeyboardButton(
-                    text=f"❌ {product.name}",
+                    text="➖",
+                    callback_data=f"cart_minus_{item.id}"
+                ),
+                InlineKeyboardButton(
+                    text=f"{item.quantity}",
+                    callback_data="none"
+                ),
+                InlineKeyboardButton(
+                    text="➕",
+                    callback_data=f"cart_plus_{item.id}"
+                )
+            ]
+        )
+
+
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    text=f"❌ Удалить {product.name}",
                     callback_data=f"delete_cart_{item.id}"
                 )
             ]
         )
+
 
     buttons.append(
         [
@@ -24,6 +44,7 @@ def cart_keyboard(items):
             )
         ]
     )
+
 
     return InlineKeyboardMarkup(
         inline_keyboard=buttons

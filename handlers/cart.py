@@ -1,5 +1,5 @@
 from aiogram import Router
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from keyboards.cart import cart_keyboard
 from database.session import async_session
 from database.models import CartItem, Product, User
@@ -84,3 +84,108 @@ async def cart(message: Message):
         text,
         reply_markup=cart_keyboard(items)
     )
+@router.callback_query(
+    lambda c: c.data.startswith("delete_cart_")
+)
+async def delete_cart_item(
+    callback: CallbackQuery
+):
+
+    item_id = int(
+        callback.data.split("_")[2]
+    )
+
+
+    async with async_session() as session:
+
+        result = await session.execute(
+            select(CartItem).where(
+                CartItem.id == item_id
+            )
+        )
+
+        item = result.scalar()
+
+
+        if item:
+
+            await session.delete(item)
+
+            await session.commit()
+
+
+    await callback.answer(
+        "✅ Товар удалён"
+    )
+
+
+    await callback.message.edit_text(
+        "🛒 Товар удалён из корзины."
+    )
+@router.callback_query(
+    lambda c: c.data.startswith("cart_plus_")
+)
+async def cart_plus(
+    callback: CallbackQuery
+):
+
+    item_id = int(
+        callback.data.split("_")[2]
+    )
+
+
+    async with async_session() as session:
+
+        result = await session.execute(
+            select(CartItem).where(
+                CartItem.id == item_id
+            )
+        )
+
+        item = result.scalar()
+
+        if item:
+            item.quantity += 1
+            await session.commit()
+
+
+    await callback.answer("Количество увеличено")
+    await callback.message.delete()
+
+@router.callback_query(
+    lambda c: c.data.startswith("cart_minus_")
+)
+async def cart_minus(
+    callback: CallbackQuery
+):
+
+    item_id = int(
+        callback.data.split("_")[2]
+    )
+
+
+    async with async_session() as session:
+
+        result = await session.execute(
+            select(CartItem).where(
+                CartItem.id == item_id
+            )
+        )
+
+        item = result.scalar()
+
+
+        if item:
+
+            if item.quantity > 1:
+                item.quantity -= 1
+
+            else:
+                await session.delete(item)
+
+
+            await session.commit()
+
+
+    await callback.answer("Количество изменено")
+    await callback.message.delete()
