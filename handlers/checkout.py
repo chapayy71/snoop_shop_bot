@@ -108,12 +108,26 @@ async def checkout_address(
 
         cart_items = cart_result.all()
 
+
         if not cart_items:
             await message.answer(
                 "🛒 Корзина пустая."
             )
             await state.clear()
             return
+
+        for item, product in cart_items:
+
+            if product.stock < item.quantity:
+
+                await message.answer(
+                    f"❌ Недостаточно товара:\n"
+                    f"{product.name}\n"
+                    f"Доступно: {product.stock} шт."
+                )
+
+                await state.clear()
+                return
 
 
         total = 0

@@ -1,3 +1,6 @@
+from database.models import Order, OrderItem, Product, User
+from database.session import async_session
+from sqlalchemy import select
 from states.product import ProductEdit
 from aiogram import Router
 from aiogram.types import Message, KeyboardButton, ReplyKeyboardMarkup
@@ -456,5 +459,75 @@ async def edit_stock(
         f"✅ Остаток изменён: {stock}"
     )
 
+@router.message(
+    lambda message:
+    message.text == "📦 Заказы"
+)
+async def admin_orders(
+    message: Message
+):
+
+    if message.from_user.id != int(ADMIN_ID):
+        return
+
+
+    async with async_session() as session:
+
+        result = await session.execute(
+            select(Order)
+            .order_by(Order.id.desc())
+        )
+
+        orders = result.scalars().all()
+
+
+    if not orders:
+
+        await message.answer(
+            "📦 Заказов пока нет."
+        )
+
+        return
+
+
+    for order in orders:
+
+
+        async with async_session() as session:
+
+            items_result = await session.execute(
+                select(OrderItem, Product)
+                .join(
+                    Product,
+                    OrderItem.product_id == Product.id
+                )
+                .where(
+                    OrderItem.order_id == order.id
+                )
+            )
+
+            items = items_result.all()
+
+
+        products_text = ""
+
+        for item, product in items:
+
+            products_text += (
+                f"• {product.name} "
+                f"x{item.quantity}\n"
+            )
+
+
+        await message.answer(
+            f"📦 Заказ #{order.id}\n\n"
+            f"👤 {order.customer_name}\n"
+            f"📱 {order.phone}\n"
+            f"🏠 {order.address}\n\n"
+            f"🛒 Товары:\n"
+            f"{products_text}\n"
+            f"💰 {order.total_price} ₽\n"
+            f"📌 {order.status}"
+        )
 
     await state.clear()
