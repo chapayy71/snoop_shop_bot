@@ -1,6 +1,7 @@
 from aiogram import Router
+from keyboards.cart import cart_delete_keyboard
 from aiogram.types import Message
-from keyboards.cart import checkout_keyboard
+from keyboards.cart import cart_keyboard
 from database.session import async_session
 from database.models import CartItem, Product, User
 
@@ -82,5 +83,5 @@ async def cart(message: Message):
 
     await message.answer(
         text,
-        reply_markup=checkout_keyboard
+        reply_markup=cart_keyboard(items)
     )
