@@ -26,19 +26,11 @@ router = Router()
 admin_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(
-                text="➕ Добавить товар"
-            )
+            KeyboardButton(text="➕ Добавить товар"),
+            KeyboardButton(text="📦 Товары")
         ],
         [
-            KeyboardButton(
-                text="✏️ Изменить товар"
-            )
-        ],
-        [
-            KeyboardButton(
-                text="🗑 Удалить товар"
-            )
+            KeyboardButton(text="📦 Заказы")
         ]
     ],
     resize_keyboard=True
