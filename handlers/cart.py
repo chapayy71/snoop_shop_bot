@@ -72,6 +72,12 @@ async def update_cart_message(
         text,
         reply_markup=cart_keyboard(items)
     )
+@router.message(
+    lambda message:
+    message.text == "🛒 Корзина"
+)
+async def cart(message: Message):
+
 @router.callback_query(
     lambda c: c.data.startswith("delete_cart_")
 )
