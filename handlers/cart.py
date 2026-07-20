@@ -1,5 +1,4 @@
 from aiogram import Router
-from keyboards.cart import cart_delete_keyboard
 from aiogram.types import Message
 from keyboards.cart import cart_keyboard
 from database.session import async_session
