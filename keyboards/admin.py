@@ -1,3 +1,0 @@
-KeyboardButton(
-    text="📦 Заказы"
-)

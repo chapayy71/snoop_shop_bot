@@ -77,6 +77,8 @@ async def add_product_start(
     if message.from_user.id != ADMIN_ID:
         return
 
+    await state.clear()
+
 
     await message.answer(
         "📂 Введите ID категории:"
@@ -278,11 +280,14 @@ async def delete_product_callback(
     message.text == "✏️ Изменить товар"
 )
 async def edit_product_start(
-    message: Message
+    message: Message,
+    state: FSMContext
 ):
 
     if message.from_user.id != ADMIN_ID:
         return
+
+    await state.clear()
 
 
     async with async_session() as session:
@@ -469,8 +474,11 @@ async def edit_stock(
     message.text == "📦 Заказы"
 )
 async def admin_orders(
-    message: Message
+    message: Message,
+    state: FSMContext
 ):
+
+    await state.clear()
 
     if message.from_user.id != int(ADMIN_ID):
         return
