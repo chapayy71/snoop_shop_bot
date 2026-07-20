@@ -10,28 +10,19 @@ from sqlalchemy import select
 router = Router()
 
 
-@router.message(
-    lambda message:
-    message.text == "🛒 Корзина"
-)
-async def cart(message: Message):
-
+async def update_cart_message(
+    callback: CallbackQuery
+):
+    
     async with async_session() as session:
 
         user_result = await session.execute(
             select(User).where(
-                User.telegram_id == message.from_user.id
+                User.telegram_id == callback.from_user.id
             )
         )
 
         user = user_result.scalar()
-
-
-        if not user:
-            await message.answer(
-                "Пользователь не найден."
-            )
-            return
 
 
         result = await session.execute(
@@ -45,13 +36,12 @@ async def cart(message: Message):
             )
         )
 
-
         items = result.all()
 
 
     if not items:
 
-        await message.answer(
+        await callback.message.edit_text(
             "🛒 Корзина пуста."
         )
         return
@@ -75,12 +65,10 @@ async def cart(message: Message):
         )
 
 
-    text += (
-        f"💰 Итого: {total} ₽"
-    )
+    text += f"💰 Итого: {total} ₽"
 
 
-    await message.answer(
+    await callback.message.edit_text(
         text,
         reply_markup=cart_keyboard(items)
     )
@@ -119,9 +107,8 @@ async def delete_cart_item(
     )
 
 
-    await callback.message.edit_text(
-        "🛒 Товар удалён из корзины."
-    )
+    await update_cart_message(callback)
+
 @router.callback_query(
     lambda c: c.data.startswith("cart_plus_")
 )
@@ -150,7 +137,7 @@ async def cart_plus(
 
 
     await callback.answer("Количество увеличено")
-    await callback.message.delete()
+    await update_cart_message(callback)
 
 @router.callback_query(
     lambda c: c.data.startswith("cart_minus_")
@@ -188,4 +175,4 @@ async def cart_minus(
 
 
     await callback.answer("Количество изменено")
-    await callback.message.delete()
+    await update_cart_message(callback)
